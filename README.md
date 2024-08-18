@@ -1,4 +1,4 @@
-# XRayAlerts Plugin
+# XRayAlerts
 
 **XRayAlerts** is a plugin for Paper/Spigot servers that can alert staff members (or any player with the appropriate permission) whenever a player finds specific ores or items. It supports customizable alerts, configurable monitoring modes, and permission-based access control. The plugin is compatible with both Paper and Spigot servers running Minecraft 1.21+.
 
@@ -14,10 +14,10 @@
 
 ## Commands
 
-### `/xray toggle`
+### `/xrayalerts toggle`
 Toggles the x-ray alerts on or off for the player who runs the command.\
 **Permission**: `xrayalerts.toggle`\
-**Usage**: `/xray toggle`
+**Usage**: `/xrayalerts toggle`
 
 ## Permissions
 
