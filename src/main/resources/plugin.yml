@@ -1,0 +1,20 @@
+name: XRayAlerts
+main: gg.tjr.mc.xrayalerts.XRayAlertsPlugin
+version: 1.0.0
+api-version: 1.21
+commands:
+  xrayalerts:
+    description: "Toggle x-ray ore alerts."
+    usage: "/xrayalerts"
+    permission: "xrayalerts.toggle"
+    permission-message: "You do not have permission to do that."
+permissions:
+  xrayalerts.ignore:
+    description: "Prevents x-ray alerts from being triggered."
+    default: false
+  xrayalerts.receive:
+    description: "Allows receiving of potential x-ray alerts."
+    default: op
+  xrayalerts.toggle:
+    description: "Allows toggling of potential x-ray alerts."
+    default: op

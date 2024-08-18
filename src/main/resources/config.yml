@@ -1,0 +1,12 @@
+alert-message: "&c&lX-Ray&r &7%player% found &6%count% %item%."
+
+mode: "block" # Options: "block", "vein"
+
+monitored-blocks:
+  - ANCIENT_DEBRIS
+  - DEEPSLATE_DIAMOND_ORE
+  - DEEPSLATE_EMERALD_ORE
+  - DEEPSLATE_GOLD_ORE
+  - DIAMOND_ORE
+  - EMERALD_ORE
+  - GOLD_ORE
