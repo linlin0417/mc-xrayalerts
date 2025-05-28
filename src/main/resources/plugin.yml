@@ -1,6 +1,8 @@
 name: XRayAlerts
-main: gg.tjr.mc.xrayalerts.XRayAlertsPlugin
-version: 1.0.0
+main: LinlinSaya.mc.rayalerts.XRayAlertsPlugin
+version: 2.0.0
+author: linlin
+description: 檢測並警報可能使用 X-Ray 作弊的玩家
 api-version: '1.20'
 commands:
   xrayalerts:

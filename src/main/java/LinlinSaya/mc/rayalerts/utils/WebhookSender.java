@@ -1,6 +1,6 @@
-package gg.tjr.mc.xrayalerts.utils;
+package LinlinSaya.mc.rayalerts.utils;
 
-import gg.tjr.mc.xrayalerts.XRayAlertsPlugin;
+import LinlinSaya.mc.rayalerts.XRayAlertsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 

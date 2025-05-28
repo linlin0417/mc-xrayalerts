@@ -1,7 +1,7 @@
-package gg.tjr.mc.xrayalerts;
+package LinlinSaya.mc.rayalerts;
 
-import gg.tjr.mc.xrayalerts.commands.XRayAlertsCommand;
-import gg.tjr.mc.xrayalerts.listeners.OreMineListener;
+import LinlinSaya.mc.rayalerts.commands.XRayAlertsCommand;
+import LinlinSaya.mc.rayalerts.listeners.OreMineListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class XRayAlertsPlugin extends JavaPlugin {
@@ -130,7 +130,7 @@ public class XRayAlertsPlugin extends JavaPlugin {
             // 非同步測試 Webhook 連接
             getServer().getScheduler().runTaskAsynchronously(this, () -> {
                 getLogger().info("正在測試 Discord Webhook 連接...");
-                boolean testResult = gg.tjr.mc.xrayalerts.utils.WebhookSender.testWebhook();
+                boolean testResult = LinlinSaya.mc.rayalerts.utils.WebhookSender.testWebhook();
                 if (testResult) {
                     getLogger().info("Discord Webhook 連接測試成功");
                 } else {
