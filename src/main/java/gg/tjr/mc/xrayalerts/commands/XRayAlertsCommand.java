@@ -29,10 +29,18 @@ public class XRayAlertsCommand implements CommandExecutor {    @Override
                     XRayAlertsPlugin.getInstance(),
                     () -> {
                         boolean testResult = WebhookSender.testWebhook();
-                        
-                        if (testResult) {
-                            // 發送測試消息
-                            WebhookSender.sendToDiscord("XRayAlerts 測試消息 - 發送者: " + sender.getName());
+                          if (testResult) {
+                            // 發送測試消息（使用 Embed 格式）
+                            String testMessage = String.format(
+                                "**測試訊息**\n" +
+                                "這是一條測試訊息，用於確認 Discord Webhook 配置正確。\n\n" +
+                                "**發送者:** %s\n" +
+                                "**時間:** %s\n" +
+                                "**狀態:** 連接成功",
+                                sender.getName(),
+                                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())
+                            );
+                            WebhookSender.sendEmbedToDiscord(testMessage, "XRayAlerts 系統測試", 0x00FF00); // 綠色表示測試成功
                             XRayAlertsPlugin.getInstance().getServer().getScheduler().runTask(
                                 XRayAlertsPlugin.getInstance(),
                                 () -> sender.sendMessage("§a測試成功！已發送測試消息到 Discord。")

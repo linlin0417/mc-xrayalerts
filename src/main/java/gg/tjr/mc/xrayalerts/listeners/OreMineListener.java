@@ -25,14 +25,15 @@ public class OreMineListener implements Listener {    private final Plugin plugi
     // 記錄玩家挖掘時間，按礦物組分類
     private final Map<UUID, Long> playerDiamondLastTime = new HashMap<>();
     private final Map<UUID, Long> playerAncientDebrisLastTime = new HashMap<>();
-    
-    // 鑽石組礦物警告閾值
+      // 鑽石組礦物警告閾值
     private final int DIAMOND_WARNING_LEVEL_1 = 10; // 第一階段警告，每分鐘10個
     private final int DIAMOND_WARNING_LEVEL_2 = 20; // 第二階段警告，每分鐘20個
+    private final int DIAMOND_WARNING_LEVEL_3 = 30; // 第三階段警告，每分鐘30個
     
     // 遠古遺骸組礦物警告閾值
     private final int ANCIENT_DEBRIS_WARNING_LEVEL_1 = 5; // 第一階段警告，每分鐘5個
     private final int ANCIENT_DEBRIS_WARNING_LEVEL_2 = 10; // 第二階段警告，每分鐘10個
+    private final int ANCIENT_DEBRIS_WARNING_LEVEL_3 = 15; // 第三階段警告，每分鐘15個
     
     // 礦物組定義
     private final List<String> DIAMOND_GROUP = Arrays.asList("DIAMOND_ORE", "DEEPSLATE_DIAMOND_ORE");
@@ -91,10 +92,10 @@ public class OreMineListener implements Listener {    private final Plugin plugi
           UUID playerUUID = player.getUniqueId();
         
         // 檢查是否達到了新的階段
-        int previousCount = 0;
-        int currentCount = 0;
+        int previousCount = 0;        int currentCount = 0;
         int warningLevel1 = 0;
         int warningLevel2 = 0;
+        int warningLevel3 = 0;
         String mineralsType = "";
         
         // 根據礦物組更新計數並取得警告級別
@@ -104,6 +105,7 @@ public class OreMineListener implements Listener {    private final Plugin plugi
             currentCount = playerDiamondCount.getOrDefault(playerUUID, 0);
             warningLevel1 = DIAMOND_WARNING_LEVEL_1;
             warningLevel2 = DIAMOND_WARNING_LEVEL_2;
+            warningLevel3 = DIAMOND_WARNING_LEVEL_3;
             mineralsType = "鑽石";
         } else { // isAncientDebrisGroup
             previousCount = playerAncientDebrisCount.getOrDefault(playerUUID, 0);
@@ -111,6 +113,7 @@ public class OreMineListener implements Listener {    private final Plugin plugi
             currentCount = playerAncientDebrisCount.getOrDefault(playerUUID, 0);
             warningLevel1 = ANCIENT_DEBRIS_WARNING_LEVEL_1;
             warningLevel2 = ANCIENT_DEBRIS_WARNING_LEVEL_2;
+            warningLevel3 = ANCIENT_DEBRIS_WARNING_LEVEL_3;
             mineralsType = "遠古遺骸";
         }
         
@@ -118,45 +121,81 @@ public class OreMineListener implements Listener {    private final Plugin plugi
         // 判斷是否是初次達到或突破階段
         boolean reachedLevel1 = previousCount <= warningLevel1 && currentCount > warningLevel1;
         boolean reachedLevel2 = previousCount <= warningLevel2 && currentCount > warningLevel2;
+        boolean reachedLevel3 = previousCount <= warningLevel3 && currentCount > warningLevel3;
         
         // 如果沒有達到任何警告階段，則不發送通知
-        if (!reachedLevel1 && !reachedLevel2) {
+        if (!reachedLevel1 && !reachedLevel2 && !reachedLevel3) {
             return;
-        }        // 獲取座標信息
+        }
+          // 將總數調整為 5 的倍數 (向下取整)
+        int displayCount = (int) (Math.floor(currentCount / 5.0) * 5);// 獲取座標信息
         int x = block.getX();
         int y = block.getY();
         int z = block.getZ();
         String worldName = block.getWorld().getName();
         
         // 從配置文件讀取分流名稱
-        String serverName = config.getString("server.name", "分流資訊無法獲取");
-        
-        // 根據達到的階段創建消息
+        String serverName = config.getString("server.name", "分流資訊無法獲取");        // 根據達到的階段創建消息
         final String finalMessage;
-        if (reachedLevel2) {
+        final String title;
+        final int color;
+        
+        if (reachedLevel3) {
+            title = "【警告】疑似 X-Ray 玩家檢測";
             finalMessage = String.format(
-                "【極度可疑】玩家 %s 在過去一分鐘內挖掘了 %d 個%s，共 %d 個，極有可能使用 X-Ray! " +
-                "\n位置: %s的 x:%d y:%d z:%d | 分流: %s",
+                "**玩家:** %s\n" +
+                "**礦物類型:** %s\n" +
+                "**目前挖掘數量:** %d 個\n" +
+                "**本次挖掘:** %d 個\n" +
+                "**位置:** %s 的 x:%d y:%d z:%d\n" +
+                "**分流:** %s\n\n" +
+                "該玩家過去一分鐘內挖掘的礦物數量非常異常，幾乎確定使用 X-Ray!",
                 player.getName(),
-                count,
                 mineralsType,
-                currentCount,
+                displayCount,
+                count,
                 worldName,
                 x, y, z,
                 serverName
             );
+            color = 0xFF0000; // 紅色，表示警告
+        } else if (reachedLevel2) {
+            title = "【極度可疑】疑似 X-Ray 玩家檢測";
+            finalMessage = String.format(
+                "**玩家:** %s\n" +
+                "**礦物類型:** %s\n" +
+                "**目前挖掘數量:** %d 個\n" +
+                "**本次挖掘:** %d 個\n" +
+                "**位置:** %s 的 x:%d y:%d z:%d\n" +
+                "**分流:** %s\n\n" +
+                "該玩家過去一分鐘內挖掘的礦物數量極度異常，極有可能使用 X-Ray!",
+                player.getName(),
+                mineralsType,
+                displayCount,
+                count,
+                worldName,
+                x, y, z,
+                serverName
+            );
+            color = 0xFFA500; // 橙色，表示極度可疑
         } else if (reachedLevel1) {
+            title = "【可疑】疑似 X-Ray 玩家檢測";
             finalMessage = String.format(
-                "【可疑】玩家 %s 在過去一分鐘內挖掘了 %d 個%s，共 %d 個，可能使用 X-Ray! " +
-                "\n位置: %s的 x:%d y:%d z:%d | 分流: %s",
-                player.getName(),
-                count,
+                "**玩家:** %s\n" +
+                "**礦物類型:** %s\n" +
+                "**目前挖掘數量:** %d 個\n" +
+                "**本次挖掘:** %d 個\n" +
+                "**位置:** %s 的 x:%d y:%d z:%d\n" +
+                "**分流:** %s\n\n" +
+                "該玩家過去一分鐘內挖掘的礦物數量異常，可能使用 X-Ray!",                player.getName(),
                 mineralsType,
-                currentCount,
+                displayCount,
+                count,
                 worldName,
                 x, y, z,
                 serverName
             );
+            color = 0xFFA500; // 橙色，表示可疑
         } else {
             // 這個情況實際上不會發生，因為已經在上面返回了
             return;
@@ -164,8 +203,8 @@ public class OreMineListener implements Listener {    private final Plugin plugi
         
         // 不再發送到遊戲內（關閉 OP 通知）
         
-        // 發送到 Discord Webhook
-        WebhookSender.sendToDiscord(finalMessage);
+        // 發送到 Discord Webhook (使用 Embed 格式)
+        WebhookSender.sendEmbedToDiscord(finalMessage, title, color);
     }
 
     private Set<Block> findVein(Block startBlock, Material material) {

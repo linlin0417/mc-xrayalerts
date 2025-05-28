@@ -20,10 +20,30 @@ public class WebhookSender {
     private static final XRayAlertsPlugin plugin = XRayAlertsPlugin.getInstance();
 
     /**
-     * 發送消息到 Discord Webhook
+     * 發送純文本消息到 Discord Webhook（保留向下兼容）
      * @param message 要發送的消息內容
      */
     public static void sendToDiscord(String message) {
+        // 根據消息類型選擇適當的顏色和標題
+        if (message.contains("【警告】")) {
+            sendEmbedToDiscord(message, "【警告】疑似 X-Ray 玩家檢測", 0xFF0000); // 紅色，表示最高警告級別
+        } else if (message.contains("【極度可疑】")) {
+            sendEmbedToDiscord(message, "【極度可疑】疑似 X-Ray 玩家檢測", 0xFFA500); // 橙色
+        } else if (message.contains("【可疑】")) {
+            sendEmbedToDiscord(message, "【可疑】疑似 X-Ray 玩家檢測", 0xFFA500); // 橙色
+        } else {
+            // 默認情況下發送普通警告
+            sendEmbedToDiscord(message, "X-Ray 警報系統通知", 0xFFFF00); // 黃色
+        }
+    }
+    
+    /**
+     * 發送帶有 Embed 格式的消息到 Discord Webhook
+     * @param message 消息內容
+     * @param title 標題
+     * @param color 顏色 (十進制格式，例如：0xFF0000 表示紅色)
+     */
+    public static void sendEmbedToDiscord(String message, String title, int color) {
         FileConfiguration config = plugin.getConfig();
         String webhookUrl = config.getString("discord.webhook-url");
         boolean enabled = config.getBoolean("discord.enabled", false);
@@ -35,13 +55,23 @@ public class WebhookSender {
         }
         
         // 進行日誌記錄，便於測試和排除問題
-        plugin.getLogger().info("準備發送 Discord webhook 消息");
+        plugin.getLogger().info("準備發送 Discord webhook embed 消息");
 
         // 處理消息，轉義特殊字符
         String safeMessage = escapeJsonString(message);
+        String safeTitle = escapeJsonString(title);
         
-        // Discord Webhook JSON格式
-        String jsonMessage = String.format("{\"content\":\"%s\"}", safeMessage);
+        // 創建當前時間戳
+        long timestamp = System.currentTimeMillis();
+        
+        // Discord Webhook Embed JSON格式
+        String jsonMessage = String.format(
+            "{\"embeds\":[{\"title\":\"%s\",\"description\":\"%s\",\"color\":%d,\"timestamp\":\"%s\"}]}",
+            safeTitle,
+            safeMessage,
+            color,
+            getISOTimestamp(timestamp)
+        );
         
         // 非同步發送請求，避免阻塞主線程
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -138,6 +168,18 @@ public class WebhookSender {
     }
     
     /**
+     * 獲取 ISO 8601 格式的時間戳，用於 Discord Embed
+     * @param timestamp 時間戳（毫秒）
+     * @return ISO 8601 格式的時間戳字串
+     */
+    private static String getISOTimestamp(long timestamp) {
+        java.util.Date date = new java.util.Date(timestamp);
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+        return sdf.format(date);
+    }
+    
+    /**
      * 測試 Discord Webhook 連線
      * @return 連線測試結果 (true: 成功, false: 失敗)
      */
@@ -175,8 +217,15 @@ public class WebhookSender {
             connection.setConnectTimeout(10000); // 10秒連線超時
             connection.setReadTimeout(10000);    // 10秒讀取超時
             
-            String timestamp = String.valueOf(System.currentTimeMillis());
-            String testMessage = "{\"content\":\"XRayAlerts 插件連接測試 - " + timestamp + "\"}";
+            long now = System.currentTimeMillis();
+            String formattedTime = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(now));
+            
+            // 使用 Embed 格式發送測試消息
+            String testMessage = String.format(
+                "{\"embeds\":[{\"title\":\"XRayAlerts 系統連線測試\",\"description\":\"這是一條自動發送的測試訊息，用於確認 Webhook 連線狀態正常。\\n\\n**測試時間:** %s\",\"color\":5814783,\"timestamp\":\"%s\"}]}",
+                formattedTime,
+                getISOTimestamp(now)
+            );
             
             // 寫入請求內容
             plugin.getLogger().info("正在發送測試消息...");
