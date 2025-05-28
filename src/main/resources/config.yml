@@ -6,6 +6,10 @@ discord:
   enabled: false # 是否啟用 Discord Webhook 通知
   webhook-url: "" # 在此填入你的 Discord Webhook URL
 
+# 伺服器資訊
+server:
+  name: "分流資訊無法獲取" # 伺服器分流名稱，會顯示在警告消息中
+
 monitored-blocks:
   - ANCIENT_DEBRIS
   - DEEPSLATE_DIAMOND_ORE

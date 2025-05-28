@@ -50,10 +50,10 @@ public class XRayAlertsCommand implements CommandExecutor {    @Override
                 // 重新載入配置
                 XRayAlertsPlugin plugin = XRayAlertsPlugin.getInstance();
                 plugin.reloadConfig();
-                
-                // 檢查配置狀態
+                  // 檢查配置狀態
                 boolean webhookEnabled = plugin.getConfig().getBoolean("discord.enabled", false);
                 String webhookUrl = plugin.getConfig().getString("discord.webhook-url", "");
+                String serverName = plugin.getConfig().getString("server.name", "分流資訊無法獲取");
                 
                 sender.sendMessage("§a配置已重新載入!");
                 sender.sendMessage("§e Discord Webhook 狀態: " + (webhookEnabled ? "§a已啟用" : "§c未啟用"));
@@ -72,6 +72,9 @@ public class XRayAlertsCommand implements CommandExecutor {    @Override
                         });
                     });
                 }
+                
+                // 顯示分流名稱設定
+                sender.sendMessage("§e伺服器分流名稱: §7" + serverName);
                 return true;
             }
         }

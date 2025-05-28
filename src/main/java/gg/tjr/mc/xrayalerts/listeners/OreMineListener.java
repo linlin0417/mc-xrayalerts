@@ -122,25 +122,40 @@ public class OreMineListener implements Listener {    private final Plugin plugi
         // 如果沒有達到任何警告階段，則不發送通知
         if (!reachedLevel1 && !reachedLevel2) {
             return;
-        }
+        }        // 獲取座標信息
+        int x = block.getX();
+        int y = block.getY();
+        int z = block.getZ();
+        String worldName = block.getWorld().getName();
+        
+        // 從配置文件讀取分流名稱
+        String serverName = config.getString("server.name", "分流資訊無法獲取");
         
         // 根據達到的階段創建消息
         final String finalMessage;
         if (reachedLevel2) {
             finalMessage = String.format(
-                "【極度可疑】玩家 %s 在過去一分鐘內挖掘了 %d 個%s，共 %d 個，極有可能使用 X-Ray!",
+                "【極度可疑】玩家 %s 在過去一分鐘內挖掘了 %d 個%s，共 %d 個，極有可能使用 X-Ray! " +
+                "\n位置: %s的 x:%d y:%d z:%d | 分流: %s",
                 player.getName(),
                 count,
                 mineralsType,
-                currentCount
+                currentCount,
+                worldName,
+                x, y, z,
+                serverName
             );
         } else if (reachedLevel1) {
             finalMessage = String.format(
-                "【可疑】玩家 %s 在過去一分鐘內挖掘了 %d 個%s，共 %d 個，可能使用 X-Ray!",
+                "【可疑】玩家 %s 在過去一分鐘內挖掘了 %d 個%s，共 %d 個，可能使用 X-Ray! " +
+                "\n位置: %s的 x:%d y:%d z:%d | 分流: %s",
                 player.getName(),
                 count,
                 mineralsType,
-                currentCount
+                currentCount,
+                worldName,
+                x, y, z,
+                serverName
             );
         } else {
             // 這個情況實際上不會發生，因為已經在上面返回了

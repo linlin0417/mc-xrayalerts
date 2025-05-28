@@ -42,8 +42,7 @@ public class XRayAlertsPlugin extends JavaPlugin {
     
     /**
      * 檢查配置預設值
-     */
-    private void checkConfigDefaults() {
+     */    private void checkConfigDefaults() {
         boolean configChanged = false;
         
         if (!getConfig().contains("discord")) {
@@ -61,13 +60,22 @@ public class XRayAlertsPlugin extends JavaPlugin {
             configChanged = true;
         }
         
+        if (!getConfig().contains("server")) {
+            getConfig().createSection("server");
+            configChanged = true;
+        }
+        
+        if (!getConfig().contains("server.name")) {
+            getConfig().set("server.name", "分流資訊無法獲取");
+            configChanged = true;
+        }
+        
         if (configChanged) {
             saveConfig();
             getLogger().info("已更新配置文件預設值");
         }
     }
-    
-    /**
+      /**
      * 打印當前配置狀態
      */
     private void logCurrentConfig() {
@@ -82,6 +90,10 @@ public class XRayAlertsPlugin extends JavaPlugin {
         } else if (getConfig().getBoolean("discord.enabled") && webhookUrl.isEmpty()) {
             getLogger().warning("警告: Discord Webhook 已啟用但未設置 URL");
         }
+        
+        // 顯示分流名稱
+        String serverName = getConfig().getString("server.name", "分流資訊無法獲取");
+        getLogger().info("伺服器分流名稱: " + serverName);
     }
     
     /**
