@@ -63,13 +63,16 @@ public class OreMineListener implements Listener {    private final Plugin plugi
 
         if (player.hasPermission("xrayalerts.ignore")) {
             return;
-        }
-
-        // 只處理指定礦物類型
+        }        // 只處理指定礦物類型
         boolean isDiamondGroup = DIAMOND_GROUP.contains(materialName);
         boolean isAncientDebrisGroup = ANCIENT_DEBRIS_GROUP.contains(materialName);
         
         if (!isDiamondGroup && !isAncientDebrisGroup) {
+            return;
+        }
+        
+        // 如果是鑽石系礦物，檢查Y座標，只有Y座標 <= 16 的才計算
+        if (isDiamondGroup && block.getY() > 16) {
             return;
         }
 

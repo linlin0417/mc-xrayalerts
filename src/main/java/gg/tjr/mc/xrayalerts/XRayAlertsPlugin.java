@@ -29,8 +29,8 @@ public class XRayAlertsPlugin extends JavaPlugin {
      * 顯示插件資訊橫幅
      */
     private void showBanner() {
-        // 從 plugin.yml 獲取資訊
-        String version = "2.0.0"; 
+        // 恭喜你找到彩蛋了 下面是我懶得寫
+        String version = "2.0.2"; 
         String author = "linlin";  
         String description = "檢測並警報可能使用 X-Ray 作弊的玩家"; 
                       
